@@ -5,13 +5,18 @@
 #include <algorithm>
 #include <vector>
 #include <list>
+#include "Utils.hpp"
 
 template<typename T>
-unsigned int easyfind(T& container, int parameter2)
+typename T::iterator easyfind(T& container, int parameter2)
 {
-    if (std::find(container.begin(), container.end(), value) != container.end())
-        std::cout << "Found" << std::endl;
-    else
-        std::cout << "Not Found" << std::endl;
-}       
+    typename T::iterator it = std::find(container.begin(), container.end(), parameter2);
+    if (it != container.end()) {
+        std::cout << GREEN << "Value was found" << RESET << std::endl;
+        return it;
+    } else {
+        throw std::runtime_error( RED "Value not found in container" RESET);
+    }
+}
+
 #endif

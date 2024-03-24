@@ -17,11 +17,6 @@
 #endif
 
 ///Exceptions
-#define ILLEGAL_ADD             "[Span elements already full]       "
-#define SUCESS_ADD              "[Sucessfully added new element]    "
-#define SPAN_TOO_SMALL          "[The span is to small for that op] "
-#define SUCESS_SPAN             "[The span was successfully calc]   "
-#define SPAN_SIZE_ERROR         "[Span size is invalid]             "
 
 #if DEBUG_MODE == 1
 // Default Messages optimized

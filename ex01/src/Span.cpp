@@ -1,60 +1,120 @@
 #include "../includes/Span.hpp"
 
-Span::Span(unsigned int const N) : N(N)
+Span::Span(void)
 {
-    this->elements = this->_vector.begin();
+    if (DEBUG_MODE == 1)
+        std::cout << RED << DEFAULT_CONSTRUCTOR << RESET << std::endl;
 }
 
-unsigned int Span::size()
+Span::Span(unsigned int const N) : N(N)
 {
-    int i = -1;
-    unsigned int counter = 0;
-    while (elements[++i] != '\0')
-        counter++;
-    return counter;
+    if (DEBUG_MODE == 1)
+        std::cout << GREEN << PARAMTER_CONSTRUCTOR << RESET << std::endl;
+    if (N < 0)
+    {
+        delete this;
+        throw IllegalSpanSizeException();
+    }
+}
+
+Span::Span(const Span & other)
+{
+    if (DEBUG_MODE == 1)
+        std::cout << GREEN << COPY_CONSTRUCTOR << RESET << std::endl;
+    *this = other;
+}
+
+Span& Span::operator=(const Span& other)
+{
+    if (DEBUG_MODE == 1)
+        std::cout << GREEN << ASSIGMENT_OPERATOR << RESET << std::endl;
+    if (this != &other)
+    {
+        this->N = other.N;
+        this->elements = other.elements;
+    }
+    return *this;
+}
+
+Span::~Span()
+{
+    if (DEBUG_MODE == 1)
+        std::cout << GREEN << DESTRUCTOR << RESET << std::endl;
 }
 
 void Span::addNumber(int number)
 {
-    if (this->size() >= N)
+    if (elements.size() >= N)
         throw IllegalAddException();
-    elements[this->size() + 1] = number;
-    std::cout << GREEN SUCESS_ADD RESET << std::endl;
+    elements.push_back( number );
+    if (DEBUG_MODE == 1)
+        std::cout << GREEN SUCESS_ADD RESET << std::endl;
 }
 
 int Span::shortestSpan()
 {
-    int i = 0;
-    if (this->size() <= 0)
+    //std::cout << *this << std::endl;
+    std::list<int>::const_iterator iter = this->getList()->begin();
+    std::list<int>::const_iterator iter2 = this->getList()->begin();
+    int span = std::abs((*++iter) - *iter2);
+    //std::cout << GREEN  << "Span: " << span << RESET << std::endl;
+    if(elements.size() < 2)
         throw IllegalSpanException();
-    int smallest = elements[0];
-    int second_smallest = elements[0];
-    while (elements[++i] != '\0')
+    while (iter2 != this->getList()->end())
     {
-        if (elements[i] > smallest && elements[i] < second_smallest)
-            second_smallest = elements[i];
-        if (elements[i] < smallest)
-            smallest = elements[i];
+        //std::cout << RED << "Out iter: " << *iter2 << RESET << std::endl;
+        iter = iter2;
+        while(++iter != this->getList()->end())
+        {
+            //std::cout << YELLOW << "In iter: " << *iter << RESET << std::endl;
+            if (std::abs(*iter - *iter2) < span)
+            {
+                span = std::abs(*iter - *iter2);
+                //std::cout << CYAN  << "New Span: " << span << " with: " << *iter << ", " << *iter2 << RESET << std::endl;
+            }
+        }
+        ++iter2;
     }
-    std::cout << GREEN SUCESS_SPAN RESET << std::endl;
-    return (second_smallest - smallest);
+    return (span);
 }
 
 int Span::longestSpan()
 {
-    int i = 0;
-    if (this->size() <= 0)
+    std::list<int>::const_iterator iter = this->getList()->begin();
+    int smallest = *iter;
+    int biggest = *(++iter);
+    if(elements.size() < 2)
         throw IllegalSpanException();
-    int shortest = elements[0];
-    int biggest = elements[0];
-    while (elements[++i] != '\0')
+    if (smallest > biggest)
     {
-        if (elements[i] > biggest)
-            biggest = elements[i];
-        if (elements[i] < shortest)
-            shortest = elements[i];
-        std::cout << "Current biggest and smallest: " << biggest << shortest << std::endl;
+        int temp = smallest;
+        smallest = biggest;
+        biggest = temp;
     }
-    std::cout << GREEN SUCESS_SPAN RESET << std::endl;
-    return (biggest - shortest);
+    while (++iter != this->getList()->end())
+    {
+        if (smallest > *iter)
+            smallest = *iter;
+        if (biggest < *iter)
+            biggest = *iter;
+    }
+    if (DEBUG_MODE == 1)
+        std::cout << MAGENTA << "biggestSpan(): Smallest && Biggest: " 
+            << smallest << ", " << biggest << RESET << std::endl;
+    return (biggest - smallest);
+}
+
+const std::list<int>* Span::getList() const{
+    return &elements;
+}
+
+std::ostream& operator<<(std::ostream &os, const Span& span)
+{
+    std::list<int>::const_iterator iter = span.getList()->begin();
+    while (iter != span.getList()->end())
+    {
+        os << *iter << " ";
+        iter++;
+    }
+    return os;
 }
